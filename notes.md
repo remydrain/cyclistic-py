@@ -2,7 +2,7 @@
 These are notes of my process as things come up. Normally I'd add this document to my gitignore file, but I'm putting it here as an insight to my analysis (and learning) process.
 
 ## To Do
-- [ ] Station names and IDs
+- [ ] Bike station names and IDs
 
 ## BigQuery
 * Some of the tables are missing station names and ids
@@ -12,3 +12,7 @@ These are notes of my process as things come up. Normally I'd add this document 
 * 202211 has 0.0 as the min_lat_end and min_lng_end after first query to find minmax
     * Added a WHERE clause to exclude 0.0
     * Returned expected range of values - saving WHERE clause to view
+* Used aggregated min and max long and lat to filter weather stations to Chicago area
+* Combined relevant date ranges from gsod22 and gsod23 tables and joined with Chicago stations table to get an aggregate weather table for the area from May 2022 - Apr 2023
+    * Still too large to download as .csv from BQ
+    * Eliminate duplicate/unnecessary columns
