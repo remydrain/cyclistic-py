@@ -47,11 +47,69 @@ UNION ALL
 SELECT * FROM `db.cyclistic.22_05`
 ) AS m
 
--- create aggregate table of weather data for specified date range
+-- create table containing only stations within the dataset geo range
+
 SELECT *
-FROM `bigquery-public-data.noaa_gsod.gsod2022` AS gsod22
-WHERE date > '2022-04-30'
-UNION ALL
+FROM `bigquery-public-data.noaa_gsod.stations`
+WHERE
+  lat <= (
+    SELECT max_lat
+    FROM `db.cyclistic.lat_long`
+  ) AND
+  lat >= (
+    SELECT min_lat
+    FROM `db.cyclistic.lat_long`
+  ) AND
+  lon <= (
+    SELECT max_lng
+    FROM `db.cyclistic.lat_long`
+  ) AND
+  lon >= (
+    SELECT min_lng
+    FROM `db.cyclistic.lat_long`
+  )
+
+-- create aggregate weather table for date and geo range
+
 SELECT *
-FROM `bigquery-public-data.noaa_gsod.gsod2023` AS gsod23
-WHERE date < '2023-05-01'
+FROM (
+  SELECT *
+  FROM `bigquery-public-data.noaa_gsod.gsod2022` AS gs22
+  WHERE gs22.date > '2022-04-30'
+  UNION ALL
+  SELECT *
+  FROM `bigquery-public-data.noaa_gsod.gsod2023` AS gs23
+  WHERE gs23.date < '2023-05-01'
+  ) AS gs
+  JOIN (
+    SELECT
+      stn.usaf,
+      stn.wban AS wbn,
+      stn.name,
+      stn.country,
+      stn.state,
+      stn.call,
+      stn.begin,
+      stn.end,
+      stn.lat,
+      stn.lon,
+    FROM `db.cyclistic.chi_stns` AS stn)as stns
+    ON gs.stn = stns.usaf
+
+-- queried above result into area weather averages by date for final weather table
+
+SELECT
+  date,
+  AVG(temp) AS avg_temp,
+  AVG(CAST(wdsp AS float64)) AS avg_wind_knots,
+  AVG(prcp) AS avg_precip_inches,
+  AVG(sndp) AS avg_snow_depth_inches,
+  SUM(CAST(fog AS int64)) AS fog,
+  SUM(CAST(rain_drizzle AS int64)) AS rain_drizzle,
+  SUM(CAST(snow_ice_pellets AS int64)) AS snow_ice_pellets,
+  SUM(CAST(hail AS int64)) AS hail,
+  SUM(CAST(thunder AS int64)) AS thunder,
+  SUM(CAST(tornado_funnel_cloud AS int64)) AS tornado_funnel_cloud
+FROM `capstone-387220.cyclistic.agg_stn_weather`
+GROUP BY date
+ORDER BY date ASC
