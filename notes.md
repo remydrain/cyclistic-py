@@ -16,3 +16,4 @@ These are notes of my process as things come up. Normally I'd add this document 
 * Combined relevant date ranges from gsod22 and gsod23 tables and joined with Chicago stations table to get an aggregate weather table for the area from May 2022 - Apr 2023
     * Still too large to download as .csv from BQ
     * Eliminate duplicate/unnecessary columns
+* Aggregated average weather conditions by date and read resulting csv into notebook
