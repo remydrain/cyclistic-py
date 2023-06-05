@@ -5,7 +5,7 @@ These are notes of my process as things come up. Normally I'd add this document 
 - [ ] Calculate ride length for all bike tables
 - [ ] Create day_of_week column for all bike tables
 - [ ] Drop unnecessary columns
-- [ ] Add SQL queries to directory
+- [x] Add SQL queries to directory
 
 ## BigQuery
 * Some of the tables are missing station names and ids
